@@ -1,6 +1,8 @@
 package com.GlobalBlogAppBackend.GlobalBlogAppBackend.services;
 
+import com.GlobalBlogAppBackend.GlobalBlogAppBackend.dtos.ApiResponse;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.dtos.BlogDTO;
+import com.GlobalBlogAppBackend.GlobalBlogAppBackend.dtos.UpdateBlogRequestDTO;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.entities.Blog;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.entities.User;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.exceptions.ApiException;
@@ -64,6 +66,40 @@ public class BlogService {
             return ResponseEntity.ok(blogOptional.get());
         }catch (Exception e){
             log.error("error while getting blog {}",e.getMessage());
+            throw e;
+        }
+    }
+
+    public ResponseEntity<?> deleteBlog(String blogId) {
+        try {
+            Optional<Blog> blogOptional = blogRepository.findById(blogId);
+            if (blogOptional.isEmpty()) {
+                throw new ApiException("blog not found");
+            }
+            blogRepository.deleteById(blogId);
+            return ResponseEntity.ok(new ApiResponse("Blog deleted successfully",true));
+        }catch (Exception e){
+            log.error("Error while deleting blog {}",e.getMessage());
+            throw e;
+        }
+    }
+
+    public ResponseEntity<?> updateBlog(String blogId, UpdateBlogRequestDTO request) {
+        try {
+            Optional<Blog> blogOptional = blogRepository.findById(blogId);
+            if (blogOptional.isEmpty()) {
+                throw new ApiException("blog not found");
+            }
+            Blog blog = blogOptional.get();
+            blog.setTitle(request.getTitle());
+            blog.setSubTitle(request.getSubTitle());
+            blog.setContent(request.getContent());
+            blog.setTags(request.getTags());
+            blog.setCategory(request.getCategory());
+            blogRepository.save(blog);
+            return ResponseEntity.ok(blog);
+        } catch (Exception e){
+            log.error("Error while updating blog {}",e.getMessage());
             throw e;
         }
     }

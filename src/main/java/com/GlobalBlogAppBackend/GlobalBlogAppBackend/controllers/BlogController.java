@@ -1,6 +1,7 @@
 package com.GlobalBlogAppBackend.GlobalBlogAppBackend.controllers;
 
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.dtos.BlogDTO;
+import com.GlobalBlogAppBackend.GlobalBlogAppBackend.dtos.UpdateBlogRequestDTO;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.entities.ConsumerDetails;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.repositories.ConsumerDetailsRepository;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.services.BlogService;
@@ -36,4 +37,13 @@ public class BlogController {
         return blogService.getBlogById(blogId);
     }
 
+    @DeleteMapping("/{blogId}")
+    public ResponseEntity<?> deleteBlog(@PathVariable(name = "blogId") String blogId){
+        return blogService.deleteBlog(blogId);
+    }
+
+    @PutMapping("/{blogId}")
+    public ResponseEntity<?> updateBlog(@PathVariable(name = "blogId") String blogId,@RequestBody UpdateBlogRequestDTO request){
+        return blogService.updateBlog(blogId,request);
+    }
 }

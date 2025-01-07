@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Comment {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @ManyToOne
