@@ -46,4 +46,16 @@ public class BlogController {
     public ResponseEntity<?> updateBlog(@PathVariable(name = "blogId") String blogId,@RequestBody UpdateBlogRequestDTO request){
         return blogService.updateBlog(blogId,request);
     }
+
+    @GetMapping("/{consumerName}")
+    public ResponseEntity<?> getAllBlogsOfaConsumer(
+            @PathVariable(name = "consumerName") String consumerName,
+            @RequestParam(name = "sortBy", defaultValue = "updatedAt") String sortBy,
+            @RequestParam(name = "category", required = false) String category,
+            @RequestParam(name = "search", required = false) String searchQuery,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
+
+        return blogService.getAllBlogsOfaConsumer(consumerName, sortBy, category, searchQuery, page, size);
+    }
 }

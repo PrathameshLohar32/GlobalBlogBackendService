@@ -34,14 +34,14 @@ public class CommentService {
             Optional<Blog> blogOptional = blogRepository.findById(commentDTO.getBlogId());
             if (blogOptional.isEmpty()) {
                 log.info("blog not found with id {}", commentDTO.getBlogId());
-                throw new ResourceNotFoundException("Blog not found");
+                throw new ResourceNotFoundException("Blog");
             }
             comment.setBlog(blogOptional.get());
             comment.setReplies(List.of());
             Optional<User> userOptional = userRepository.findById(commentDTO.getUserId());
             if (userOptional.isEmpty()) {
                 log.info("user not found with id {}", commentDTO.getUserId());
-                throw new ResourceNotFoundException("user not found");
+                throw new ResourceNotFoundException("user");
             }
             comment.setUser(userOptional.get());
             return ResponseEntity.ok(comment);
@@ -52,5 +52,42 @@ public class CommentService {
     }
 
 
+    public ResponseEntity<?> getCommentById(String commentId) {
+        try{
+            Optional<Comment>commentOptional = commentRepository.findById(commentId);
+            if(commentOptional.isEmpty()){
+                throw new ResourceNotFoundException("comment");
+            }
+            return ResponseEntity.ok(commentOptional.get());
+        } catch (Exception e){
+            log.error("Error while getting comment");
+            throw e;
+        }
+    }
 
+    public ResponseEntity<?> getCommentsOnBlog(String blogId) {
+        try {
+            List<Comment>comments = commentRepository.findByBlogId(blogId);
+            if(comments.isEmpty()){
+                throw new ResourceNotFoundException("comments");
+            }
+            return ResponseEntity.ok(comments);
+        }catch (Exception e){
+            log.error("Error while fetching comments for blogId {} {}" ,blogId,e.getMessage());
+            throw e;
+        }
+    }
+
+    public ResponseEntity<?> deleteComment(String commentId) {
+        try {
+            if(commentRepository.findById(commentId).isEmpty()){
+                throw new ResourceNotFoundException("comment");
+            }
+            commentRepository.deleteById(commentId);
+            return ResponseEntity.ok(true);
+        }catch (Exception e){
+            log.error("error while deleting comment");
+            throw e;
+        }
+    }
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -39,6 +40,13 @@ public class Blog {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    private String consumerName;
+
+    private Date createdAt;
+
+    private Date updatedAt;
+
 
 
 }

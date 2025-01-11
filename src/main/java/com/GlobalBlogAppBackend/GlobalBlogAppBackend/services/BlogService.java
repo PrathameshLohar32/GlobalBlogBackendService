@@ -7,16 +7,19 @@ import com.GlobalBlogAppBackend.GlobalBlogAppBackend.entities.Blog;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.entities.User;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.exceptions.ApiException;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.repositories.BlogRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -38,6 +41,9 @@ public class BlogService {
             blog.setContent(blogDTO.getContent());
             blog.setTags(blogDTO.getTags());
             blog.setCategory(blogDTO.getCategory());
+            blog.setConsumerName(blogDTO.getConsumer());
+            blog.setCreatedAt(new Date());
+            blog.setUpdatedAt(new Date());
             List<String> images = new ArrayList<>();
             if (blogDTO.getImages().size() > 2) {
                 throw new ApiException("only 2 images are allowed");
@@ -70,6 +76,58 @@ public class BlogService {
         }
     }
 
+    public ResponseEntity<?> getAllBlogsOfaConsumer(
+            String consumerName, String sortBy, String category, String searchQuery, int page, int size) {
+
+        try {
+            // Create Pageable object with sorting
+            Pageable pageable = PageRequest.of(page, size);
+
+            // Create a specification object based on the search and category parameters
+            Specification<Blog> spec = (root, query, criteriaBuilder) -> {
+                Predicate predicate = criteriaBuilder.equal(root.get("consumerName"), consumerName);
+
+                // Apply search query filter if present
+                if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+                    Predicate searchPredicate = criteriaBuilder.or(
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), "%" + searchQuery.toLowerCase() + "%"),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("subTitle")), "%" + searchQuery.toLowerCase() + "%"),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("content")), "%" + searchQuery.toLowerCase() + "%"),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("tags")), "%" + searchQuery.toLowerCase() + "%"),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("category")), "%" + searchQuery.toLowerCase() + "%")
+                    );
+                    predicate = criteriaBuilder.and(predicate, searchPredicate);
+                }
+
+                // Apply category filter if present
+                if (category != null && !category.trim().isEmpty()) {
+                    predicate = criteriaBuilder.and(predicate,
+                            criteriaBuilder.isMember(category, root.get("category")));
+                }
+
+                // Apply sorting (default is by "updatedAt")
+                if (sortBy != null) {
+                    if ("updatedAt".equals(sortBy)) {
+                        query.orderBy(criteriaBuilder.desc(root.get("updatedAt")));
+                    } else if ("createdAt".equals(sortBy)) {
+                        query.orderBy(criteriaBuilder.desc(root.get("createdAt")));
+                    }
+                }
+
+                return predicate;
+            };
+
+            // Fetch the paginated blogs based on the specification
+            Page<Blog> blogPage = blogRepository.findAll(spec, pageable);
+
+            // Return paginated response with necessary metadata
+            return ResponseEntity.ok(blogPage);
+        } catch (Exception e) {
+            log.error("Error while fetching blogs: {}", e.getMessage());
+            throw e;
+        }
+    }
+
     public ResponseEntity<?> deleteBlog(String blogId) {
         try {
             Optional<Blog> blogOptional = blogRepository.findById(blogId);
@@ -96,6 +154,7 @@ public class BlogService {
             blog.setContent(request.getContent());
             blog.setTags(request.getTags());
             blog.setCategory(request.getCategory());
+            blog.setUpdatedAt(new Date());
             blogRepository.save(blog);
             return ResponseEntity.ok(blog);
         } catch (Exception e){
