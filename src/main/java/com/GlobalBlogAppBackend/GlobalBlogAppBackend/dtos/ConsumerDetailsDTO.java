@@ -16,7 +16,11 @@ import java.util.List;
 @NoArgsConstructor
 public class ConsumerDetailsDTO {
 
-    private String name;
+//    private String name;
 
     private List<ConsumerDetails.BlogCategory> masterList;
+
+    private String getUserApi;
+
+    private String getUserApikey;
 }

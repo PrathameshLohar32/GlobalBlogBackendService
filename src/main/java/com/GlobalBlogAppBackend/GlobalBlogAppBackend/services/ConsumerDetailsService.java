@@ -1,17 +1,32 @@
 package com.GlobalBlogAppBackend.GlobalBlogAppBackend.services;
 
+import com.GlobalBlogAppBackend.GlobalBlogAppBackend.controllers.CreateConsumerRequest;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.dtos.ApiResponse;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.dtos.ConsumerDetailsDTO;
+import com.GlobalBlogAppBackend.GlobalBlogAppBackend.dtos.LoginRequest;
+import com.GlobalBlogAppBackend.GlobalBlogAppBackend.dtos.LoginResponse;
+import com.GlobalBlogAppBackend.GlobalBlogAppBackend.entities.ConsumerCredentials;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.entities.ConsumerDetails;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.exceptions.ApiException;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.exceptions.ResourceNotFoundException;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.repositories.ConsumerDetailsRepository;
+import com.GlobalBlogAppBackend.GlobalBlogAppBackend.security.JWTUtils;
 import lombok.extern.slf4j.Slf4j;
+import com.GlobalBlogAppBackend.GlobalBlogAppBackend.security.SecurityConfig.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -20,8 +35,10 @@ public class ConsumerDetailsService {
     @Autowired
     ConsumerDetailsRepository consumerDetailsRepository;
 
-    public ResponseEntity<?> addCategoryToMasterList(String consumerName, ConsumerDetails.BlogCategory category) {
+
+    public ResponseEntity<?> addCategoryToMasterList( ConsumerDetails.BlogCategory category) {
         try {
+            String consumerName = SecurityContextHolder.getContext().getAuthentication().getName();
             Optional<ConsumerDetails> consumerDetails = consumerDetailsRepository.findById(consumerName);
             if(consumerDetails.isEmpty()){
                 throw new ResourceNotFoundException("Consumer","consumerName",consumerName);
@@ -38,15 +55,17 @@ public class ConsumerDetailsService {
         }
     }
 
-    public ResponseEntity<?> addConsumer(ConsumerDetailsDTO consumerDetailsDTO) {
+    public ResponseEntity<?> addConsumerDetails(ConsumerDetailsDTO consumerDetailsDTO) {
         try {
-            Optional<ConsumerDetails> consumerDetails = consumerDetailsRepository.findById(consumerDetailsDTO.getName());
-            if (consumerDetails.isPresent()) {
-                throw new ApiException("Consumer with same name already exists");
+            String consumerName = SecurityContextHolder.getContext().getAuthentication().getName();
+            Optional<ConsumerDetails> consumerDetails = consumerDetailsRepository.findById(consumerName);
+            if (consumerDetails.isEmpty()) {
+                throw new ResourceNotFoundException("Consumer");
             }
-            ConsumerDetails newConsumerDetails = new ConsumerDetails();
-            newConsumerDetails.setName(consumerDetailsDTO.getName());
+            ConsumerDetails newConsumerDetails = consumerDetails.get();
             newConsumerDetails.setMasterList(consumerDetailsDTO.getMasterList());
+            newConsumerDetails.setGetUserApi(consumerDetailsDTO.getGetUserApi());
+            newConsumerDetails.setGetUserApiKey(consumerDetailsDTO.getGetUserApikey());
             consumerDetailsRepository.save(newConsumerDetails);
             return ResponseEntity.ok(new ApiResponse("consumer added successfully", true));
         }catch (ApiException e){
@@ -75,3 +94,4 @@ public class ConsumerDetailsService {
         }
     }
 }
+

@@ -26,8 +26,7 @@ public class UserService {
             }
             user.setUserId(userDTO.getUserId());
             user.setEmail(user.getEmail());
-            user.setFirstName(user.getFirstName());
-            user.setLastName(user.getLastName());
+            user.setName(userDTO.getName());
             user.setConsumerName(user.getConsumerName());
 
             userRepository.save(user);

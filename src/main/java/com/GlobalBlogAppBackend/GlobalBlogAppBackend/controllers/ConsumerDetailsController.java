@@ -1,6 +1,7 @@
 package com.GlobalBlogAppBackend.GlobalBlogAppBackend.controllers;
 
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.dtos.ConsumerDetailsDTO;
+import com.GlobalBlogAppBackend.GlobalBlogAppBackend.dtos.LoginRequest;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.entities.ConsumerDetails;
 import com.GlobalBlogAppBackend.GlobalBlogAppBackend.services.ConsumerDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +16,17 @@ public class ConsumerDetailsController {
     private ConsumerDetailsService consumerDetailsService;
 
     @PostMapping("/add-category/{consumerName}")
-    public ResponseEntity<?> addCategoryToMasterList(@PathVariable String consumerName, @RequestBody ConsumerDetails.BlogCategory category){
-        return consumerDetailsService.addCategoryToMasterList(consumerName,category);
+    public ResponseEntity<?> addCategoryToMasterList(@RequestBody ConsumerDetails.BlogCategory category){
+        return consumerDetailsService.addCategoryToMasterList(category);
     }
-    @PostMapping("/add-consumer")
-    public ResponseEntity<?> addConsumer(@RequestBody ConsumerDetailsDTO consumerDetailsDTO){
-        return consumerDetailsService.addConsumer(consumerDetailsDTO);
+    @PostMapping("/add-consumer-details")
+    public ResponseEntity<?> addConsumerDetails(@RequestBody ConsumerDetailsDTO consumerDetailsDTO){
+        return consumerDetailsService.addConsumerDetails(consumerDetailsDTO);
     }
 
     @GetMapping("/get-master-list/{consumerName}")
     public ResponseEntity<?> getMasterList(@PathVariable String consumerName){
         return consumerDetailsService.getMasterList(consumerName);
     }
+
 }

@@ -19,9 +19,7 @@ public class User {
     @NonNull
     private String userId;
 
-    private String firstName;
-
-    private String lastName;
+    private String name;
 
     private String email;
 
