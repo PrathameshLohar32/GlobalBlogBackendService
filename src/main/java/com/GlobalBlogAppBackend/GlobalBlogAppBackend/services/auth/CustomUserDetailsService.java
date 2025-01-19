@@ -35,7 +35,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
         ConsumerCredentials consumerCredentials = userOptional.orElseThrow(() ->
                 new ResourceNotFoundException("consumerService", "email or username", emailOrUsername));
-        log.info("User found: {}", consumerCredentials);
         return new org.springframework.security.core.userdetails.User(
                 consumerCredentials.getName(),
                 consumerCredentials.getPassword(),

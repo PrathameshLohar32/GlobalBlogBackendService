@@ -61,7 +61,7 @@ public class ConsumerAuthenticationService {
             return ResponseEntity.ok(new ApiResponse("consumer created successfully",true));
 
         }catch (Exception e){
-            log.info("Error while creating consumer {}",e.getMessage());
+            log.error("Error while creating consumer {}",e.getMessage());
             throw e;
         }
     }

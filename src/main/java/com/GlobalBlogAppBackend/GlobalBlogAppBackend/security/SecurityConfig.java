@@ -37,7 +37,7 @@ public class SecurityConfig {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/v3/api-docs/**","/swagger-ui/**","/h2-console/**","/api/v1/auth/register-consumer","/api/v1/auth/login").permitAll()
+                        .requestMatchers("/v3/api-docs/**","/swagger-ui/**","/h2-console/**","/api/v1/auth/register-consumer","/api/v1/auth/login","/api/v1/blogs/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
