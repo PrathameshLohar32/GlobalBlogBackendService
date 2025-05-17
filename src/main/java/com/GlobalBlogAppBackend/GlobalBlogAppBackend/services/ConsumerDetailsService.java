@@ -24,10 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -43,7 +40,12 @@ public class ConsumerDetailsService {
             if(consumerDetails.isEmpty()){
                 throw new ResourceNotFoundException("Consumer","consumerName",consumerName);
             }
-            consumerDetails.get().getMasterList().add(category);
+            List<ConsumerDetails.BlogCategory> masterlist = consumerDetails.get().getMasterList();
+            if(masterlist == null){
+                masterlist = new ArrayList<>();
+            }
+            masterlist.add(category);
+            consumerDetails.get().setMasterList(masterlist);
             consumerDetailsRepository.save(consumerDetails.get());
             return ResponseEntity.ok(new ApiResponse("category added successfully",true));
         } catch (ResourceNotFoundException e) {

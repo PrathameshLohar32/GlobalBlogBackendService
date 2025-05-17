@@ -32,7 +32,7 @@ public class BlogController {
         return blogService.createBlog(blogDTO);
     }
 
-    @GetMapping("/{blogId}")
+    @GetMapping("getBlog/{blogId}")
     public ResponseEntity<?> getBlog(@PathVariable(name = "blogId") String blogId){
         return blogService.getBlogById(blogId);
     }
